@@ -5,7 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
+
+	"github.com/joho/godotenv"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -18,8 +21,16 @@ type User struct {
 }
 
 func main() {
-	connStr := "postgres://ramis:secret@localhost:5432/mydb?sslmode=disable"
-	var err error
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Предупреждение: файл .env не найден, используем системные переменные")
+	}
+
+	// Берем строку подключения из переменной окружения
+	connStr := os.Getenv("DATABASE_URL")
+	if connStr == "" {
+		panic("Переменная DATABASE_URL не задана!")
+	}
 	db, err = sql.Open("pgx", connStr)
 	if err != nil {
 		panic(err)
