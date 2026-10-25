@@ -29,7 +29,7 @@ func UsersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func createUser(w http.ResponseWriter, r *http.Request) {
-	var u models.User // Используем models.User
+	var u models.User 
 	defer r.Body.Close()
 
 	err := json.NewDecoder(r.Body).Decode(&u)
@@ -51,7 +51,6 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAllUsers(w http.ResponseWriter, r *http.Request) {
-	// Используем database.DB
 	rows, err := database.DB.Query("SELECT id, name FROM users")
 	if err != nil {
 		http.Error(w, "database error", http.StatusInternalServerError)
@@ -106,7 +105,6 @@ func getOneUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var u models.User
-	// Используем database.DB
 	err = database.DB.QueryRow("SELECT id, name FROM users WHERE id = $1", id).Scan(&u.ID, &u.Name)
 
 	if err == sql.ErrNoRows {
