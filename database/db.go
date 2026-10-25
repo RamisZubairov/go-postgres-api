@@ -14,12 +14,12 @@ var DB *sql.DB
 func Connect() {
 	err := godotenv.Load()
 	if err != nil {
-		fmt.Println("Предупреждение: файл .env не найден")
+		fmt.Println("Файл .env не найден")
 	}
 
 	connStr := os.Getenv("DATABASE_URL")
 	if connStr == "" {
-		panic("Переменная DATABASE_URL не задана!")
+		panic("DATABASE_URL не задана!")
 	}
 
 	DB, err = sql.Open("pgx", connStr)
@@ -31,5 +31,5 @@ func Connect() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Успешно подключились к БД из пакета database!")
+	fmt.Println("Успешно подключились к БД!")
 }
