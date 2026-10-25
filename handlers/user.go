@@ -21,6 +21,8 @@ func UsersHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			getAllUsers(w, r)
 		}
+	case http.MethodPut: 
+		updateUser(w, r)
 	case http.MethodDelete:
 		deleteUser(w, r)
 	default:
@@ -116,5 +118,38 @@ func getOneUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(u)
+}
+
+func updateUser(w http.ResponseWriter, r *http.Request) {
+	var u models.User
+	defer r.Body.Close()
+
+	err := json.NewDecoder(r.Body).Decode(&u)
+	if err != nil {
+		http.Error(w, "invalid json", http.StatusBadRequest)
+		return
+	}
+
+	if u.ID == 0 {
+		http.Error(w, "id is required", http.StatusBadRequest)
+		return
+	}
+
+	result, err := database.DB.Exec("UPDATE users SET name = $1 WHERE id = $2", u.Name, u.ID)
+	if err != nil {
+		fmt.Println("Ошибка БД:", err)
+		http.Error(w, "database error", http.StatusInternalServerError)
+		return
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		http.Error(w, "user not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(u)
 }
